@@ -47,10 +47,6 @@ export default function FormPage() {
       }
     });
 
-    const formData = new FormData(event.currentTarget);
-    const data = Object.fromEntries(formData);
-    console.log("[handleOptimize] Collected form data:", data);
-
     setIsOptimizing(true);
     console.log("[handleOptimize] Set isOptimizing to true.");
 
