@@ -1,4 +1,6 @@
 // Simplified version of the use-toast hook
+'use client'
+
 import { useState } from 'react'
 
 export interface Toast {
@@ -8,13 +10,14 @@ export interface Toast {
 }
 
 export const useToast = () => {
-  const [toast, setToast] = useState<Toast | null>(null)
+  const [toastState, setToastState] = useState<Toast | null>(null)
 
-  const showToast = (newToast: Toast) => {
-    setToast(newToast)
-    setTimeout(() => setToast(null), 3000)
+  const toast = (newToast: Toast) => {
+    setToastState(newToast)
+    setTimeout(() => setToastState(null), 3000)
   }
 
-  return { toast, showToast }
+  return { toastState, toast }
 }
+
 
