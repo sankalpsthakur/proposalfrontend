@@ -22,6 +22,35 @@ export default function FormPage() {
     const data = Object.fromEntries(formData);
     console.log("[handleOptimize] Collected form data:", data);
 
+    // Convert numeric values to floats
+    const numericFields = [
+      "client_h2flowrate", "client_h2flowhours", "projectLifetime", "o2MarketSellLimit",
+      "excessProductionH2MerchantLimit", "electrolyzerstackConversion100Percent",
+      "electrolyzerstackConversionMinTurndown", "stackMinTurndownratio", "stackefficiencydegradation",
+      "stackLifetime", "TotalAuxRatedPowerDuringOperating", "TotalAuxRatedPowerOutsideOperating",
+      "BatteryroundtripEfficiency", "BatteryLife", "BatteryCapacityAnnualDegradation",
+      "PVOutputAnnualDegradation", "PV_DC_size_LowerRange", "PV_DC_size_HigherRange",
+      "inverter_ac_size_low", "inverter_ac_size_high", "wind_size_low", "wind_size_high",
+      "power_evactuation_size_low", "power_evactuation_size_high", "ltoa_size_low", "ltoa_size_high",
+      "battery_size_low", "battery_size_high", "electrolyser_size_low", "electrolyser_size_high",
+      "low_bar_h2_storage_size_low", "low_bar_h2_storage_size_high", "high_bar_h2_storage_size_low",
+      "high_bar_h2_storage_size_high", "h2_compressor_throughput_low", "h2_compressor_throughput_high",
+      "o2_storage_low", "o2_storage_high", "o2_compressor_throughput_low", "o2_compressor_throughput_high"
+    ];
+
+    numericFields.forEach(field => {
+      if (data[field] !== undefined) {
+        const parsedValue = parseFloat(data[field]);
+        if (!isNaN(parsedValue)) {
+          data[field] = parsedValue;
+        }
+      }
+    });
+
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData);
+    console.log("[handleOptimize] Collected form data:", data);
+
     setIsOptimizing(true);
     console.log("[handleOptimize] Set isOptimizing to true.");
 
