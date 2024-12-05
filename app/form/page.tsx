@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Input } from "../components/ui/input"
-import { Label } from "../components/ui/label"
-import { Button } from "../components/ui/button"
-import { useToast } from "../components/ui/use-toast"
-import { OptimizationResults } from "../components/OptimizationResults"
+import { useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Button } from "../components/ui/button";
+import { useToast } from "../components/ui/use-toast";
+import { OptimizationResults } from "../components/OptimizationResults";
 
 export default function FormPage() {
-  const [activeTab, setActiveTab] = useState("assumptions-variables")
-  const [isOptimizing, setIsOptimizing] = useState(false)
-  const { toast } = useToast()
+  const [activeTab, setActiveTab] = useState("assumptions-variables");
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const { toast } = useToast();
 
   const handleOptimize = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -47,44 +47,63 @@ export default function FormPage() {
       }
     });
 
-    setIsOptimizing(true)
+    const formData = new FormData(event.currentTarget);
+    const data = Object.fromEntries(formData);
+    console.log("[handleOptimize] Collected form data:", data);
+
+    setIsOptimizing(true);
+    console.log("[handleOptimize] Set isOptimizing to true.");
 
     try {
-      // Replace this with actual API call
+      const requestBody = JSON.stringify({ Ui_variables: data });
+      console.log("[handleOptimize] Sending POST request to /api/optimize with body:", requestBody);
+
       const response = await fetch('/api/optimize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
-      })
+        body: requestBody,
+      });
+
+      console.log("[handleOptimize] Received response:", response);
 
       if (!response.ok) {
-        throw new Error('Optimization request failed')
+        console.error("[handleOptimize] Non-OK response status:", response.status, response.statusText);
+        const errorText = await response.text();
+        console.error("[handleOptimize] Response error text:", errorText);
+        throw new Error('Optimization request failed');
       }
 
-      const result = await response.json()
+      const result = await response.json();
+      console.log("[handleOptimize] Parsed JSON response:", result);
 
       if (result.status === 'queued') {
+        console.log("[handleOptimize] Optimization request queued successfully.");
         toast({
           title: "Optimization request queued",
           description: "Your request has been queued. Results will be sent to your email address in approximately one hour.",
-        })
-        setActiveTab("results")
+        });
+        setActiveTab("results");
       } else {
-        throw new Error('Unexpected response from server')
+        console.error("[handleOptimize] Unexpected response structure:", result);
+        throw new Error('Unexpected response from server');
       }
-    } catch (error) {
-      console.error('Optimization failed:', error)
+    } catch (error: any) {
+      console.error("[handleOptimize] Caught error:", error);
+      if (error.stack) {
+        console.error("[handleOptimize] Error stack:", error.stack);
+      }
       toast({
         title: "Optimization request failed",
         description: "An error occurred while submitting your optimization request. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsOptimizing(false)
+      console.log("[handleOptimize] Final cleanup: Setting isOptimizing to false.");
+      setIsOptimizing(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto p-4">
@@ -300,6 +319,5 @@ export default function FormPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
-
