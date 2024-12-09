@@ -40,9 +40,12 @@ export default function FormPage() {
 
     numericFields.forEach(field => {
       if (data[field] !== undefined) {
-        const parsedValue = parseFloat(data[field]);
-        if (!isNaN(parsedValue)) {
-          data[field] = parsedValue;
+        const value = data[field];
+        if (typeof value === 'string') {
+          const parsedValue = parseFloat(value);
+          if (!isNaN(parsedValue)) {
+            data[field] = value;
+          }
         }
       }
     });
