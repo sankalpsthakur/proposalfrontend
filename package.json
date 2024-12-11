@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "main": "app/page.tsx",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0 -p 61907",
     "build": "next build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "export": "next build && next export"
   },
   "author": "",
   "license": "ISC",
