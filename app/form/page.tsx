@@ -8,8 +8,9 @@ import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 import { useToast } from "../components/ui/use-toast";
 import { OptimizationResults } from "../components/OptimizationResults";
+import { withAuth } from "../form/authWrapper";
 
-export default function FormPage() {
+function FormPage() {
   const [activeTab, setActiveTab] = useState("assumptions-variables");
   const [isOptimizing, setIsOptimizing] = useState(false);
   const { toast } = useToast();
@@ -320,3 +321,4 @@ export default function FormPage() {
     </div>
   );
 }
+export default withAuth(FormPage);
