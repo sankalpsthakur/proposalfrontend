@@ -1,26 +1,34 @@
-"use client";
+"use client"
 
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Label } from "../components/ui/label";
-import { Button } from "../components/ui/button";
-import { useToast } from "../components/ui/use-toast";
-import { OptimizationResults } from "../components/OptimizationResults";
+import { useState } from 'react'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { FinancialModelSummary } from "@/components/FinancialModelSummary"
 
-export default function FormPage() {
-  const [activeTab, setActiveTab] = useState("assumptions-variables");
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const { toast } = useToast();
+const financialModels = [
+  { id: "basic", name: "Basic Model", description: "Standard financial model for small to medium projects" },
+  { id: "advanced", name: "Advanced Model", description: "Comprehensive model with detailed cash flow projections" },
+  { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
+]
+
+export default function OptimisePage() {
+  const [activeTab, setActiveTab] = useState("financial-model")
+  const [isOptimizing, setIsOptimizing] = useState(false)
+  const [selectedModel, setSelectedModel] = useState("")
+  const { toast } = useToast()
 
   const handleOptimize = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log("[handleOptimize] Form submission started.");
+    event.preventDefault()
+    console.log("[handleOptimize] Form submission started.")
 
-    const formData = new FormData(event.currentTarget);
-    const data = Object.fromEntries(formData);
-    console.log("[handleOptimize] Collected form data:", data);
+    const formData = new FormData(event.currentTarget)
+    const data = Object.fromEntries(formData)
+    console.log("[handleOptimize] Collected form data:", data)
 
     // Convert numeric values to floats
     const numericFields = [
@@ -36,81 +44,118 @@ export default function FormPage() {
       "low_bar_h2_storage_size_low", "low_bar_h2_storage_size_high", "high_bar_h2_storage_size_low",
       "high_bar_h2_storage_size_high", "h2_compressor_throughput_low", "h2_compressor_throughput_high",
       "o2_storage_low", "o2_storage_high", "o2_compressor_throughput_low", "o2_compressor_throughput_high"
-    ];
+    ]
 
     numericFields.forEach(field => {
       if (data[field] !== undefined) {
-        const value = data[field];
+        const value = data[field]
         if (typeof value === 'string') {
-          const parsedValue = parseFloat(value);
+          const parsedValue = parseFloat(value)
           if (!isNaN(parsedValue)) {
-            data[field] = value;
+            data[field] = parsedValue.toString()
           }
         }
       }
-    });
+    })
 
-    setIsOptimizing(true);
-    console.log("[handleOptimize] Set isOptimizing to true.");
+    setIsOptimizing(true)
+    console.log("[handleOptimize] Set isOptimizing to true.")
 
     try {
-      const requestBody = JSON.stringify({ Ui_variables: data });
-      console.log("[handleOptimize] Sending POST request to /api/optimize with body:", requestBody);
+      const requestBody = JSON.stringify({ Ui_variables: data })
+      console.log("[handleOptimize] Sending POST request to /api/optimise with body:", requestBody)
 
-      const response = await fetch('/api/optimize', {
+      const response = await fetch('/api/optimise', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: requestBody,
-      });
+      })
 
-      console.log("[handleOptimize] Received response:", response);
+      console.log("[handleOptimize] Received response:", response)
 
       if (!response.ok) {
-        console.error("[handleOptimize] Non-OK response status:", response.status, response.statusText);
-        const errorText = await response.text();
-        console.error("[handleOptimize] Response error text:", errorText);
-        throw new Error('Optimization request failed');
+        console.error("[handleOptimize] Non-OK response status:", response.status, response.statusText)
+        const errorText = await response.text()
+        console.error("[handleOptimize] Response error text:", errorText)
+        throw new Error(`Optimization request failed: ${response.status} ${response.statusText}`)
       }
 
-      const result = await response.json();
-      console.log("[handleOptimize] Parsed JSON response:", result);
+      const result = await response.json()
+      console.log("[handleOptimize] Parsed JSON response:", result)
 
       if (result.status === 'queued') {
-        console.log("[handleOptimize] Optimization request queued successfully.");
+        console.log("[handleOptimize] Optimization request queued successfully.")
         toast({
           title: "Optimization request queued",
           description: "Your request has been queued. Results will be sent to your email address in approximately one hour.",
-        });
-        setActiveTab("results");
+        })
+        setActiveTab("results")
       } else {
-        console.error("[handleOptimize] Unexpected response structure:", result);
-        throw new Error('Unexpected response from server');
+        console.error("[handleOptimize] Unexpected response structure:", result)
+        throw new Error('Unexpected response from server')
       }
     } catch (error: any) {
-      console.error("[handleOptimize] Caught error:", error);
+      console.error("[handleOptimize] Caught error:", error)
       if (error.stack) {
-        console.error("[handleOptimize] Error stack:", error.stack);
+        console.error("[handleOptimize] Error stack:", error.stack)
       }
       toast({
         title: "Optimization request failed",
-        description: "An error occurred while submitting your optimization request. Please try again.",
+        description: error.message || "An error occurred while submitting your optimization request. Please try again.",
         variant: "destructive",
-      });
+      })
     } finally {
-      console.log("[handleOptimize] Final cleanup: Setting isOptimizing to false.");
-      setIsOptimizing(false);
+      console.log("[handleOptimize] Final cleanup: Setting isOptimizing to false.")
+      setIsOptimizing(false)
     }
+  }
+
+  const customInputs = {
+    // Add your custom input data here if needed
   };
 
   return (
     <div className="container mx-auto p-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="financial-model">Financial Model</TabsTrigger>
           <TabsTrigger value="assumptions-variables">Assumptions & Variables</TabsTrigger>
           <TabsTrigger value="results">Results</TabsTrigger>
         </TabsList>
+        <TabsContent value="financial-model">
+          <Card>
+            <CardHeader>
+              <CardTitle>Select Financial Model</CardTitle>
+              <CardDescription>Choose a financial model for your project optimization</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Select value={selectedModel} onValueChange={setSelectedModel}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a financial model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {financialModels.map((model) => (
+                      <SelectItem key={model.id} value={model.id}>
+                        {model.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedModel && (
+                  <p className="text-sm text-muted-foreground">
+                    {financialModels.find(m => m.id === selectedModel)?.description}
+                  </p>
+                )}
+                <Button onClick={() => setActiveTab("assumptions-variables")} disabled={!selectedModel}>
+                  Continue to Assumptions & Variables
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="assumptions-variables">
           <Card>
             <CardHeader>
@@ -118,6 +163,12 @@ export default function FormPage() {
               <CardDescription>Set your project assumptions and variables</CardDescription>
             </CardHeader>
             <CardContent>
+              {selectedModel && (
+                <FinancialModelSummary 
+                  model={financialModels.find(m => m.id === selectedModel)!}
+                  customInputs={customInputs}
+                />
+              )}
               <form onSubmit={handleOptimize}>
                 <div className="grid gap-4">
                   <h3 className="text-lg font-semibold">Assumptions</h3>
@@ -318,5 +369,6 @@ export default function FormPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }
+
