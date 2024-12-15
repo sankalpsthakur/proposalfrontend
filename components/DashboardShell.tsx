@@ -20,25 +20,25 @@ export default function DashboardShell({ children }: { children: React.ReactNode
             <div className="space-y-1 p-2">
               <Input className="mb-4" placeholder="Search..." />
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link href="/dashboard">
+                <Link href="/app">
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </Link>
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link href="/dashboard/projects">
+                <Link href="/app/projects">
                   <FolderOpen className="mr-2 h-4 w-4" />
                   Projects
                 </Link>
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link href="/dashboard/analytics">
+                <Link href="/app/analytics">
                   <BarChart2 className="mr-2 h-4 w-4" />
                   Analytics
                 </Link>
               </Button>
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link href="/dashboard/settings">
+                <Link href="/app/settings">
                   <Settings className="mr-2 h-4 w-4" />
                   Settings
                 </Link>

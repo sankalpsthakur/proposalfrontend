@@ -14,7 +14,7 @@ export default function LandingPage() {
               className="border-[#CCFF00] text-[#CCFF00] hover:bg-[#CCFF00] hover:text-[#1A3721] font-semibold transition-colors duration-200"
               asChild
             >
-              <Link href="/dashboard">Sign in to Dashboard</Link>
+              <Link href="/app">Sign in to Dashboard</Link>
             </Button>
           </nav>
         </div>

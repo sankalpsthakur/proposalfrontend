@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Home, FileText, BarChart2 } from 'lucide-react'
+import { Home, FileText, BarChart2, History } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { SidebarContent, SidebarFooter, SidebarHeader } from "@/components/ui/sidebar"
 
@@ -12,19 +12,25 @@ export default function Sidebar() {
       <SidebarContent className="flex-grow">
         <nav className="mt-6 space-y-2 px-4">
           <Button variant="ghost" className="w-full justify-start text-white hover:bg-[#2A4731] hover:text-[#CCFF00]" asChild>
-            <Link href="/dashboard">
+            <Link href="/app">
               <Home className="mr-2 h-5 w-5" />
               Dashboard
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-white hover:bg-[#2A4731] hover:text-[#CCFF00]" asChild>
-            <Link href="/dashboard/optimise">
+            <Link href="/app/optimise">
               <FileText className="mr-2 h-5 w-5" />
-              Optimise
+              Create a Project
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start text-white hover:bg-[#2A4731] hover:text-[#CCFF00]" asChild>
-            <Link href="/dashboard/analyse">
+            <Link href="/app/past-optimizations">
+              <History className="mr-2 h-5 w-5" />
+              Past Optimizations
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start text-white hover:bg-[#2A4731] hover:text-[#CCFF00]" asChild>
+            <Link href="/app/analyse">
               <BarChart2 className="mr-2 h-5 w-5" />
               Analyse
             </Link>
