@@ -23,11 +23,6 @@ export default function RootLayout({
         </ToastProvider>
       </body>
     </html>
-<<<<<<< HEAD
   );
 }
 
-=======
-  )
-}
->>>>>>> 10ba9b5905ad7da911dddd932c1d7c7e3be4ffba

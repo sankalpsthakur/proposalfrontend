@@ -2,12 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
 
-<<<<<<< HEAD
-export default function Home() {
-  console.log('BYE');
-=======
 export default function LandingPage() {
->>>>>>> 10ba9b5905ad7da911dddd932c1d7c7e3be4ffba
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <header className="bg-[#1A3721] shadow-sm">
