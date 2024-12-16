@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { msalInstance } from './msalConfig';
+//import App from '../components/App';
 
 export function withAuth(Component) {
   return function ProtectedComponent(props) {
@@ -35,7 +36,8 @@ export function withAuth(Component) {
 
             if (response && response.accessToken) {
 
-              console.log('Authentication Token:', response.accessToken); // Log the token
+              console.log('Authentication Token:', response.accessToken);
+            //  logger.log(response.accessToken); // Log the token
 
               setAuthToken(response.accessToken); // Store the token
 

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import './globals.css'
 
 export default function Home() {
+  console.log('BYE');
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gray-900 text-white p-4">
       <div className="w-full max-w-4xl bg-gray-800 rounded-3xl overflow-hidden shadow-xl">
