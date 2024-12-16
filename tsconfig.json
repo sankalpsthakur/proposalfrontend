@@ -22,7 +22,12 @@
       }
     ],
     "target": "ES2017",
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["components/*"],
+      "@/lib/*": ["lib/*"]
+    }
   },
   "include": [
     "next-env.d.ts",
