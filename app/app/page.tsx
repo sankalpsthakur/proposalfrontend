@@ -1,45 +1,23 @@
-// 'use client';
+'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 // import { getMsalInstance } from '../form/msalConfig';
-// import { withAuth } from '../form/authWrapper';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Overview } from "@/components/Overview"
 import { RecentProjects } from "@/components/RecentProjects"
 import { Button } from "@/components/ui/button"
 import { ArrowUpRight, TrendingUp, Battery, Wind } from 'lucide-react'
+import { withAuth } from '../form/authWrapper';
+import { logout } from '../form/authUtils';
 
 function DashboardPage() {
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       const msalInstance = await getMsalInstance();
-  //       if (!msalInstance) return;
-
-  //       const accounts = msalInstance.getAllAccounts();
-  //       if (accounts.length === 0) {
-  //         await msalInstance.loginRedirect({
-  //           scopes: ['user.read'],
-  //         });
-  //       }
-  //     } catch (error) {
-  //       console.error('Authentication error:', error);
-  //     }
-  //   };
-
-  //   checkAuth();
-  // }, []);
-
-  // const handleSignOut = async () => {
-  //   try {
-  //     const msalInstance = await getMsalInstance();
-  //     if (msalInstance) {
-  //       await msalInstance.logoutRedirect();
-  //     }
-  //   } catch (error) {
-  //     console.error('Logout error:', error);
-  //   }
-  // };
+  const handleSignOut = useCallback(async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -49,7 +27,7 @@ function DashboardPage() {
           <Button 
             variant="outline" 
             className="border-[#CCFF00] text-[#CCFF00] hover:bg-[#CCFF00] hover:text-[#1A3721]"
-            // onClick={handleSignOut}
+            onClick={handleSignOut}
           >
             Sign Out
           </Button>
@@ -119,5 +97,5 @@ function DashboardPage() {
   );
 }
 
-export default DashboardPage;
-
+// export default DashboardPage;
+export default withAuth(DashboardPage);
