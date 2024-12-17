@@ -63,9 +63,9 @@ export default function OptimisePage() {
 
     try {
       const requestBody = JSON.stringify({ Ui_variables: data })
-      console.log("[handleOptimize] Sending POST request to /api/optimise with body:", requestBody)
+      console.log("[handleOptimize] Sending POST request to /api/optimize with body:", requestBody)
 
-      const response = await fetch('/api/optimise', {
+      const response = await fetch('/api/optimize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
