@@ -3,6 +3,8 @@ import { msalInstance } from './msalConfig';
 //import App from '../components/App';
 
 export function withAuth(Component) {
+
+
   return function ProtectedComponent(props) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 

@@ -1,8 +1,44 @@
+'use client';
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
+import { useRouter } from 'next/navigation';
+import { PublicClientApplication } from "@azure/msal-browser";
+import { msalInstance } from './form/msalConfig';
+import { withAuth } from './form/authWrapper';
+
 
 export default function LandingPage() {
+  const router = useRouter();
+  //Auth logic
+  const handleSignIn = async () => {
+    if (!msalInstance) {
+      console.error("MSAL instance is not initialized.");
+      return;
+    }
+  
+    try {
+      const accounts = msalInstance.getAllAccounts();
+  
+      if (accounts.length === 0) {
+        await msalInstance.loginRedirect({
+          scopes: ["user.read"],
+        });
+      } else {
+        const response = await msalInstance.acquireTokenSilent({
+          scopes: ["user.read"],
+          account: accounts[0],
+        });
+  
+        console.log("Access Token:", response.accessToken);
+      }
+    } catch (error) {
+      console.error("MSAL Sign-in Error:", error);
+    }
+  };
+  
+  
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <header className="bg-[#1A3721] shadow-sm">
@@ -13,6 +49,7 @@ export default function LandingPage() {
               variant="outline" 
               className="border-[#CCFF00] text-[#CCFF00] hover:bg-[#CCFF00] hover:text-[#1A3721] font-semibold transition-colors duration-200"
               asChild
+              onClick={handleSignIn}
             >
               <Link href="/app">Sign in to Dashboard</Link>
             </Button>

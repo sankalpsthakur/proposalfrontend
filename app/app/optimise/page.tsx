@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FinancialModelSummary } from "@/components/FinancialModelSummary"
+import { withAuth } from 'app/form/authWrapper'
 
 const financialModels = [
   { id: "basic", name: "Basic Model", description: "Standard financial model for small to medium projects" },
@@ -16,7 +17,7 @@ const financialModels = [
   { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
 ]
 
-export default function OptimisePage() {
+export function OptimisePage() {
   const [activeTab, setActiveTab] = useState("financial-model")
   const [isOptimizing, setIsOptimizing] = useState(false)
   const [selectedModel, setSelectedModel] = useState("")
@@ -371,4 +372,5 @@ export default function OptimisePage() {
     </div>
   )
 }
+export default withAuth(OptimisePage);
 

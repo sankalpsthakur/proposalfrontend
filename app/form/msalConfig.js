@@ -39,7 +39,7 @@ export const msalConfig = {
         clientId: "1533294e-4208-4859-ab56-6bd42e72da92",
         authority: "https://login.microsoftonline.com/7ae7c16b-7491-45c1-b6a7-c4dc469742af",
         knownAuthorities: [b2cPolicies.authorityDomain],
-        redirectUri: "http://localhost:3000",
+        redirectUri: "http://proposal.hygenco.in/app",
         postLogoutRedirectUri: "/"
     },
     cache: {
