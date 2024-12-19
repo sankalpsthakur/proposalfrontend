@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FinancialModelSummary } from "@/components/FinancialModelSummary"
+import { ArrowRight } from "lucide-react"
 
 const financialModels = [
-  { id: "basic", name: "Basic Model", description: "Standard financial model for small to medium projects" },
-  { id: "advanced", name: "Advanced Model", description: "Comprehensive model with detailed cash flow projections" },
-  { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
+  { id: "khopoli", name: "Khopoli Model", description: "Khopoli Model" },
+  // { id: "advanced", name: "Advanced Model", description: "Comprehensive model with detailed cash flow projections" },
+  // { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
 ]
 
 export default function RunOptimizationPage() {
@@ -102,7 +103,7 @@ export default function RunOptimizationPage() {
         console.error("[handleOptimize] Error stack:", error.stack)
       }
       toast({
-        title: "Optimization request failed",
+        title: "Optimization request failed", 
         description: error.message || "An error occurred while submitting your optimization request. Please try again.",
         variant: "destructive",
       })
@@ -133,12 +134,12 @@ export default function RunOptimizationPage() {
             <CardContent>
               <div className="space-y-4">
                 <Select value={selectedModel} onValueChange={setSelectedModel}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a financial model" />
+                  <SelectTrigger className="w-full h-10 px-3 py-2 text-base border rounded-md bg-white text-black">
+                    <SelectValue placeholder="Select a financial model" className="text-muted-foreground" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white text-black">
                     {financialModels.map((model) => (
-                      <SelectItem key={model.id} value={model.id}>
+                      <SelectItem key={model.id} value={model.id} className="cursor-pointer hover:bg-gray-100">
                         {model.name}
                       </SelectItem>
                     ))}
@@ -149,8 +150,13 @@ export default function RunOptimizationPage() {
                     {financialModels.find(m => m.id === selectedModel)?.description}
                   </p>
                 )}
-                <Button onClick={() => setActiveTab("assumptions-variables")} disabled={!selectedModel}>
+                <Button 
+                  onClick={() => setActiveTab("assumptions-variables")} 
+                  disabled={!selectedModel}
+                  className="w-full flex items-center justify-center gap-2"
+                >
                   Continue to Assumptions & Variables
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </CardContent>
@@ -376,4 +382,4 @@ export default function RunOptimizationPage() {
       </Tabs>
     </div>
   )
-} 
+}
