@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FinancialModelSummary } from "@/components/FinancialModelSummary"
 import { ArrowRight } from "lucide-react"
+import { withAuth } from '../../form/authWrapper'
 
 const financialModels = [
   { id: "khopoli", name: "Khopoli Model", description: "Khopoli Model" },
@@ -17,7 +18,7 @@ const financialModels = [
   // { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
 ]
 
-export default function RunOptimizationPage() {
+const RunOptimizationPage = () => {
   const [activeTab, setActiveTab] = useState("financial-model")
   const [isOptimizing, setIsOptimizing] = useState(false)
   const [selectedModel, setSelectedModel] = useState("")
@@ -383,3 +384,6 @@ export default function RunOptimizationPage() {
     </div>
   )
 }
+
+// export default withAuth(RunOptimizationPage)
+export default RunOptimizationPage

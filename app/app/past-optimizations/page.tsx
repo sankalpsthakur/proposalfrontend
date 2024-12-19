@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { withAuth } from '../../form/authWrapper'
 
 const optimizationResult = {
   id: "OPT-001",
@@ -53,7 +54,7 @@ const optimizationResult = {
   ]
 };
 
-export default function PastOptimizationsPage() {
+const PastOptimizationsPage = () => {
   return (
     <div>
       <Card>
@@ -145,3 +146,6 @@ export default function PastOptimizationsPage() {
     </div>
   );
 } 
+
+// export default withAuth(PastOptimizationsPage) 
+export default PastOptimizationsPage
