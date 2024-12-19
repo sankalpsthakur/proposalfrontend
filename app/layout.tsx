@@ -1,27 +1,27 @@
-"use client";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+import { ToastProvider } from "@/components/ui/toast-primitive";
 
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { useToast } from "../app/components/ui/use-toast"; // Ensure correct import
-import './globals.css';
+const inter = Inter({ subsets: ['latin'] })
 
-const inter = Inter({ subsets: ['latin'] });
-
+export const metadata: Metadata = {
+  title: 'Pablo - Green Hydrogen Solutions',
+  description: 'Optimized sizing for your green hydrogen projects',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
-  const { toast } = useToast();
-
   return (
     <html lang="en">
-      <body className={inter.className}>
-        {children}
-        {/* Ensure the Toaster is rendered once at the root */}
-        {/* The toast function can be used here if needed */}
+      <body className={`${inter.className} min-h-screen bg-background`}>
+        <ToastProvider>
+          {children}
+        </ToastProvider>
       </body>
     </html>
-  );
+  )
 }
