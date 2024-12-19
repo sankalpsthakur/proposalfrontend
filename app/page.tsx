@@ -56,11 +56,6 @@ export default function LandingPage() {
                 </div>
               ))}
             </div>
-            <div className="text-center mt-12">
-              <Button size="lg" className="bg-[#1A3721] text-white hover:bg-[#CCFF00] hover:text-[#1A3721] font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" asChild>
-                <Link href="https://forms.gle/dHvDGGf5vHZL4FSVA" target="_blank">Join Waitlist</Link>
-              </Button>
-            </div>
           </div>
         </section>
 
@@ -80,11 +75,6 @@ export default function LandingPage() {
                   <p className="text-white">{step.description}</p>
                 </div>
               ))}
-            </div>
-            <div className="text-center mt-12">
-              <Button size="lg" className="bg-[#CCFF00] text-[#1A3721] hover:bg-white hover:text-[#1A3721] font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" asChild>
-                <Link href="https://forms.gle/dHvDGGf5vHZL4FSVA" target="_blank">Join Waitlist</Link>
-              </Button>
             </div>
           </div>
         </section>
@@ -106,9 +96,6 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold text-center mb-12">Built for Transparency and Ease</h2>
             <div className="max-w-2xl mx-auto text-center">
               <p className="text-xl mb-6">Our models make it easy to visualize your project's potential. Key metrics like savings, ROI, and CAPEX are clearly annotated for quick understanding.</p>
-              <Button size="lg" className="border-2 border-[#CCFF00] bg-transparent text-[#CCFF00] hover:bg-[#CCFF00] hover:text-[#1A3721] font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" asChild>
-                <Link href="https://forms.gle/dHvDGGf5vHZL4FSVA" target="_blank">Join Waitlist</Link>
-              </Button>
             </div>
           </div>
         </section>

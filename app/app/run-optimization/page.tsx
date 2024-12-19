@@ -16,7 +16,7 @@ const financialModels = [
   { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
 ]
 
-export default function OptimisePage() {
+export default function RunOptimizationPage() {
   const [activeTab, setActiveTab] = useState("financial-model")
   const [isOptimizing, setIsOptimizing] = useState(false)
   const [selectedModel, setSelectedModel] = useState("")
@@ -347,9 +347,15 @@ export default function OptimisePage() {
                     <Input id="o2_compressor_throughput_high" name="o2_compressor_throughput_high" className="col-span-1" defaultValue="350" />
                   </div>
                 </div>
-                <Button type="submit" className="mt-6" disabled={isOptimizing}>
-                  {isOptimizing ? 'Submitting...' : 'Optimize'}
-                </Button>
+                <div className="flex justify-center">
+                  <Button 
+                    type="submit" 
+                    className="mt-6 bg-[#1A3721] text-white hover:bg-[#2A4731] hover:text-[#CCFF00] transition-colors duration-200 font-semibold px-8 py-2 rounded-lg" 
+                    disabled={isOptimizing}
+                  >
+                    {isOptimizing ? 'Submitting...' : 'Optimize'}
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -370,5 +376,4 @@ export default function OptimisePage() {
       </Tabs>
     </div>
   )
-}
-
+} 
