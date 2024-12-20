@@ -35,7 +35,8 @@ export const getMsalConfig = () => {
       authority: "https://login.microsoftonline.com/7ae7c16b-7491-45c1-b6a7-c4dc469742af",
       redirectUri: "https://proposal.hygenco.in/app",
       postLogoutRedirectUri: "/",
-      navigateToLoginRequestUrl: true
+      navigateToLoginRequestUrl: true,
+      storeAuthStateInCookie: true
     },
     cache: {
       cacheLocation: "localStorage",
@@ -43,6 +44,9 @@ export const getMsalConfig = () => {
     },
     system: {
       allowNativeBroker: false,
+      windowHashTimeout: 60000,
+      iframeHashTimeout: 6000,
+      loadFrameTimeout: 0,
       loggerOptions: {
         loggerCallback: (level, message, containsPii) => {
           if (containsPii) return;

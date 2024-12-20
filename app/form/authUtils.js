@@ -61,25 +61,38 @@ export const validateSession = async () => {
 export const logout = async () => {
   try {
     const msalInstance = await getMsalInstance();
-    if (msalInstance) {
-      // Call backend to invalidate session
-      try {
-        const accessToken = await getAccessToken();
-        await fetch(AUTH_CONFIG.endpoints.logout, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-      } catch (error) {
-        console.error('Error calling logout endpoint:', error);
-      }
+    if (!msalInstance) {
+      throw new Error(AUTH_CONFIG.errors.initFailed);
+    }
 
-      // Perform MSAL logout
+    // Call backend to invalidate session
+    let backendLogoutSuccessful = false;
+    try {
+      const accessToken = await getAccessToken();
+      const response = await fetch(AUTH_CONFIG.endpoints.logout, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      backendLogoutSuccessful = response.ok;
+      if (!backendLogoutSuccessful) {
+        console.error('Backend logout failed:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error calling logout endpoint:', error);
+      throw new Error('Failed to invalidate backend session');
+    }
+
+    if (backendLogoutSuccessful) {
+      // Only perform MSAL logout if backend session was successfully invalidated
       await msalInstance.logoutRedirect({
         postLogoutRedirectUri: AUTH_CONFIG.routes.login
       });
+    } else {
+      throw new Error('Failed to invalidate backend session');
     }
   } catch (error) {
     console.error('Logout error:', error);

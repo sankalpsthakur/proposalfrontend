@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { getMsalInstance } from './msalConfig';
 import { useRouter } from 'next/navigation';
 import { AUTH_CONFIG } from './authConfig';
@@ -11,6 +11,47 @@ export function withAuth(Component) {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const router = useRouter();
+
+    const validateToken = useCallback(async (msalInstance, account) => {
+      try {
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          scopes: AUTH_CONFIG.scopes.default,
+          account: account
+        });
+
+        // Validate token with backend
+        const response = await fetch(AUTH_CONFIG.endpoints.validate, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${tokenResponse.accessToken}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorData = await response.text();
+          console.error('Token validation failed:', errorData);
+          throw new Error(AUTH_CONFIG.errors.unauthorized);
+        }
+
+        return true;
+      } catch (error) {
+        console.error('Token validation error:', error);
+        return false;
+      }
+    }, []);
+
+    const handleLogin = useCallback(async (msalInstance) => {
+      try {
+        await msalInstance.loginRedirect({
+          scopes: AUTH_CONFIG.scopes.default,
+          prompt: 'select_account'
+        });
+      } catch (error) {
+        console.error('Login redirect error:', error);
+        setError(error.message);
+      }
+    }, []);
 
     useEffect(() => {
       const checkAuthentication = async () => {
@@ -23,64 +64,47 @@ export function withAuth(Component) {
             throw new Error(AUTH_CONFIG.errors.initFailed);
           }
 
-          // Check for active account
-          const accounts = msalInstance.getAllAccounts();
-          if (accounts.length === 0) {
-            // No active account, initiate login
-            await msalInstance.loginRedirect({
-              scopes: AUTH_CONFIG.scopes.default,
-              prompt: 'select_account'
-            });
+          // Handle redirect promise first
+          try {
+            const result = await msalInstance.handleRedirectPromise();
+            if (result) {
+              const isValid = await validateToken(msalInstance, result.account);
+              if (isValid) {
+                setIsAuthenticated(true);
+                return;
+              }
+            }
+          } catch (redirectError) {
+            console.error('Redirect error:', redirectError);
+            setError(redirectError.message);
             return;
           }
 
-          // Validate the session with backend
-          const activeAccount = accounts[0];
-          try {
-            const tokenResponse = await msalInstance.acquireTokenSilent({
-              scopes: AUTH_CONFIG.scopes.default,
-              account: activeAccount
-            });
-
-            // Validate token with backend
-            const response = await fetch(AUTH_CONFIG.endpoints.validate, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${tokenResponse.accessToken}`,
-                'Content-Type': 'application/json'
-              }
-            });
-
-            if (!response.ok) {
-              throw new Error(AUTH_CONFIG.errors.unauthorized);
-            }
-
-            setIsAuthenticated(true);
-          } catch (tokenError) {
-            // Token acquisition failed, initiate login redirect
-            await msalInstance.loginRedirect({
-              scopes: AUTH_CONFIG.scopes.default,
-              prompt: 'select_account'
-            });
+          // Check for active account
+          const accounts = msalInstance.getAllAccounts();
+          if (accounts.length === 0) {
+            await handleLogin(msalInstance);
+            return;
           }
+
+          // Validate existing account
+          const isValid = await validateToken(msalInstance, accounts[0]);
+          if (!isValid) {
+            await handleLogin(msalInstance);
+            return;
+          }
+
+          setIsAuthenticated(true);
         } catch (error) {
           console.error('Authentication error:', error);
           setError(error.message);
-          // Initiate login redirect
-          const msalInstance = await getMsalInstance();
-          if (msalInstance) {
-            await msalInstance.loginRedirect({
-              scopes: AUTH_CONFIG.scopes.default,
-              prompt: 'select_account'
-            });
-          }
         } finally {
           setIsLoading(false);
         }
       };
 
       checkAuthentication();
-    }, [router]);
+    }, [router, validateToken, handleLogin]);
 
     if (isLoading) {
       return (
