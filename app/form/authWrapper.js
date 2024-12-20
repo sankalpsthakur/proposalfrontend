@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getMsalInstance } from './msalConfig';
 import { useRouter } from 'next/navigation';
+import { AUTH_CONFIG } from './authConfig';
 
 export function withAuth(Component) {
   return function ProtectedComponent(props) {
@@ -19,7 +20,7 @@ export function withAuth(Component) {
           
           const msalInstance = await getMsalInstance();
           if (!msalInstance) {
-            throw new Error('MSAL instance not initialized');
+            throw new Error(AUTH_CONFIG.errors.initFailed);
           }
 
           // Check for active account
@@ -27,7 +28,7 @@ export function withAuth(Component) {
           if (accounts.length === 0) {
             // No active account, initiate login
             await msalInstance.loginRedirect({
-              scopes: ['user.read'],
+              scopes: AUTH_CONFIG.scopes.default,
               prompt: 'select_account'
             });
             return;
@@ -37,12 +38,12 @@ export function withAuth(Component) {
           const activeAccount = accounts[0];
           try {
             const tokenResponse = await msalInstance.acquireTokenSilent({
-              scopes: ['user.read'],
+              scopes: AUTH_CONFIG.scopes.default,
               account: activeAccount
             });
 
             // Validate token with backend
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/validate`, {
+            const response = await fetch(AUTH_CONFIG.endpoints.validate, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${tokenResponse.accessToken}`,
@@ -51,19 +52,28 @@ export function withAuth(Component) {
             });
 
             if (!response.ok) {
-              throw new Error('Session validation failed');
+              throw new Error(AUTH_CONFIG.errors.unauthorized);
             }
 
             setIsAuthenticated(true);
           } catch (tokenError) {
-            // Token acquisition failed, clear session and redirect to login
-            await msalInstance.logoutRedirect();
-            router.push('/auth-landing');
+            // Token acquisition failed, initiate login redirect
+            await msalInstance.loginRedirect({
+              scopes: AUTH_CONFIG.scopes.default,
+              prompt: 'select_account'
+            });
           }
         } catch (error) {
           console.error('Authentication error:', error);
           setError(error.message);
-          router.push('/auth-landing');
+          // Initiate login redirect
+          const msalInstance = await getMsalInstance();
+          if (msalInstance) {
+            await msalInstance.loginRedirect({
+              scopes: AUTH_CONFIG.scopes.default,
+              prompt: 'select_account'
+            });
+          }
         } finally {
           setIsLoading(false);
         }
@@ -90,10 +100,18 @@ export function withAuth(Component) {
             <div className="text-red-500 text-xl font-semibold mb-4">Authentication Error</div>
             <div className="text-white mb-4">{error}</div>
             <button 
-              onClick={() => router.push('/auth-landing')}
+              onClick={async () => {
+                const msalInstance = await getMsalInstance();
+                if (msalInstance) {
+                  await msalInstance.loginRedirect({
+                    scopes: AUTH_CONFIG.scopes.default,
+                    prompt: 'select_account'
+                  });
+                }
+              }}
               className="px-4 py-2 bg-[#CCFF00] text-[#1A3721] rounded hover:bg-white transition-colors"
             >
-              Return to Login
+              Sign In
             </button>
           </div>
         </div>

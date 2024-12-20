@@ -35,7 +35,7 @@ function NavItem({ href, icon: Icon, label }: NavItemProps) {
 
 const navigationItems = [
   {
-    href: '/app/run-optimization',
+    href: '/app',
     icon: Settings,
     label: 'Run Optimisation'
   },

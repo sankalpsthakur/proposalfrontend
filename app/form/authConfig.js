@@ -16,7 +16,6 @@ export const AUTH_CONFIG = {
   
   // Routes
   routes: {
-    login: '/auth-landing',
     home: '/app',
     unauthorized: '/unauthorized'
   },
