@@ -35,12 +35,12 @@ export const getMsalConfig = () => {
       authority: "https://login.microsoftonline.com/7ae7c16b-7491-45c1-b6a7-c4dc469742af",
       redirectUri: "https://proposal.hygenco.in/app",
       postLogoutRedirectUri: "/",
-      navigateToLoginRequestUrl: true,
-      storeAuthStateInCookie: true
+      navigateToLoginRequestUrl: true
     },
     cache: {
-      cacheLocation: "localStorage",
-      storeAuthStateInCookie: isIE || isEdge || isFirefox
+      cacheLocation: "sessionStorage",
+      storeAuthStateInCookie: true,
+      secureCookies: true
     },
     system: {
       allowNativeBroker: false,
