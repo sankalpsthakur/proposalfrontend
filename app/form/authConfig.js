@@ -3,7 +3,7 @@
 export const AUTH_CONFIG = {
   // API Endpoints
   endpoints: {
-    validate: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/validate`,
+    validate: `${process.env.NEXT_PUBLIC_API_URL}/auth/validate_session`,
     refresh: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`,
     logout: `${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`,
   },
