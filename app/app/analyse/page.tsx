@@ -37,161 +37,181 @@ export default function AnalysePage() {
   const [activeTab, setActiveTab] = useState("commercial")
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Financial Model Templates</CardTitle>
-          <CardDescription>Select a template to start your analysis</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center space-x-4">
-            <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-              <SelectTrigger className="w-[300px]">
-                <SelectValue placeholder="Select a template" />
-              </SelectTrigger>
-              <SelectContent>
-                {financialModelTemplates.map((template) => (
-                  <SelectItem key={template.id} value={template.id.toString()}>
-                    {template.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button>Load Template</Button>
-          </div>
-          {selectedTemplate && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              {financialModelTemplates.find(t => t.id.toString() === selectedTemplate)?.description}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+    <div className="flex flex-col h-screen overflow-hidden">
+      <div className="flex-shrink-0 p-4">
+        <Card>
+        <script>
+        let age = prompt('How old are you?', 100);
+        alert('hello');
+  </script>
+          <CardHeader>
+            <CardTitle>Financial Model Templates</CardTitle>
+            <CardDescription>Select a template to start your analysis</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                <SelectTrigger className="w-[300px] truncate">
+                  <SelectValue placeholder="Select a template" />
+                </SelectTrigger>
+                <SelectContent>
+                  {financialModelTemplates.map((template) => (
+                    <SelectItem key={template.id} value={template.id.toString()} className="truncate">
+                      {template.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button>Load Template</Button>
+            </div>
+            {selectedTemplate && (
+              <p className="mt-2 text-sm text-muted-foreground">
+                {financialModelTemplates.find(t => t.id.toString() === selectedTemplate)?.description}
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Project Analysis Dashboard</CardTitle>
-          <CardDescription>Comprehensive insights into your green hydrogen project</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="commercial">Commercial</TabsTrigger>
-              <TabsTrigger value="technical">Technical</TabsTrigger>
-              <TabsTrigger value="technocommercial">Techno-Commercial</TabsTrigger>
-            </TabsList>
-            <TabsContent value="commercial">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Financial Performance</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={commercialData}>
-                    <XAxis dataKey="year" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="revenue" fill="#8884d8" name="Revenue" />
-                    <Bar dataKey="costs" fill="#82ca9d" name="Costs" />
-                    <Bar dataKey="profit" fill="#ffc658" name="Profit" />
-                  </BarChart>
-                </ResponsiveContainer>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Year</TableHead>
-                      <TableHead>Revenue</TableHead>
-                      <TableHead>Costs</TableHead>
-                      <TableHead>Profit</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {commercialData.map((row) => (
-                      <TableRow key={row.year}>
-                        <TableCell>{row.year}</TableCell>
-                        <TableCell>${row.revenue.toLocaleString()}</TableCell>
-                        <TableCell>${row.costs.toLocaleString()}</TableCell>
-                        <TableCell>${row.profit.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
-            <TabsContent value="technical">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Technical Performance</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={technicalData}>
-                    <XAxis dataKey="month" />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip />
-                    <Legend />
-                    <Line yAxisId="left" type="monotone" dataKey="efficiency" stroke="#8884d8" name="Efficiency (%)" />
-                    <Line yAxisId="right" type="monotone" dataKey="uptime" stroke="#82ca9d" name="Uptime (%)" />
-                  </LineChart>
-                </ResponsiveContainer>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Month</TableHead>
-                      <TableHead>Efficiency (%)</TableHead>
-                      <TableHead>Uptime (%)</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {technicalData.map((row) => (
-                      <TableRow key={row.month}>
-                        <TableCell>{row.month}</TableCell>
-                        <TableCell>{row.efficiency}%</TableCell>
-                        <TableCell>{row.uptime}%</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
-            <TabsContent value="technocommercial">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Techno-Commercial Insights</h3>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Key Performance Indicators</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="font-semibold">Levelized Cost of Hydrogen (LCOH)</p>
-                        <p className="text-2xl">$3.50/kg</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold">Capacity Factor</p>
-                        <p className="text-2xl">85%</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold">Payback Period</p>
-                        <p className="text-2xl">7.5 years</p>
-                      </div>
-                      <div>
-                        <p className="font-semibold">CO2 Emissions Avoided</p>
-                        <p className="text-2xl">50,000 tons/year</p>
-                      </div>
+      <div className="flex-grow overflow-hidden p-4">
+        <Card className="h-full flex flex-col">
+          <CardHeader>
+            <CardTitle>Project Analysis Dashboard</CardTitle>
+            <CardDescription>Comprehensive insights into your green hydrogen project</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-grow overflow-hidden">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+              <TabsList>
+                <TabsTrigger value="commercial">Commercial</TabsTrigger>
+                <TabsTrigger value="technical">Technical</TabsTrigger>
+                <TabsTrigger value="technocommercial">Techno-Commercial</TabsTrigger>
+              </TabsList>
+
+              <div className="flex-grow overflow-auto">
+                <TabsContent value="commercial" className="h-full">
+                  <div className="space-y-4 h-full">
+                    <h3 className="text-lg font-semibold">Financial Performance</h3>
+                    <div className="h-1/2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={commercialData}>
+                          <XAxis dataKey="year" />
+                          <YAxis />
+                          <Tooltip />
+                          <Legend />
+                          <Bar dataKey="revenue" fill="#8884d8" name="Revenue" />
+                          <Bar dataKey="costs" fill="#82ca9d" name="Costs" />
+                          <Bar dataKey="profit" fill="#ffc658" name="Profit" />
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Sensitivity Analysis</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p>Placeholder for sensitivity analysis chart</p>
-                    {/* Add a chart or table for sensitivity analysis here */}
-                  </CardContent>
-                </Card>
+                    <div className="overflow-x-auto h-1/2">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Year</TableHead>
+                            <TableHead>Revenue</TableHead>
+                            <TableHead>Costs</TableHead>
+                            <TableHead>Profit</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {commercialData.map((row) => (
+                            <TableRow key={row.year}>
+                              <TableCell>{row.year}</TableCell>
+                              <TableCell>${row.revenue.toLocaleString("en-US")}
+                              </TableCell>
+                              <TableCell>${row.costs.toLocaleString("en-US")}</TableCell>
+                              <TableCell>${row.profit.toLocaleString("en-US")}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="technical" className="h-full">
+                  <div className="space-y-4 h-full">
+                    <h3 className="text-lg font-semibold">Technical Performance</h3>
+                    <div className="h-1/2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={technicalData}>
+                          <XAxis dataKey="month" />
+                          <YAxis yAxisId="left" />
+                          <YAxis yAxisId="right" orientation="right" />
+                          <Tooltip />
+                          <Legend />
+                          <Line yAxisId="left" type="monotone" dataKey="efficiency" stroke="#8884d8" name="Efficiency (%)" />
+                          <Line yAxisId="right" type="monotone" dataKey="uptime" stroke="#82ca9d" name="Uptime (%)" />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="overflow-x-auto h-1/2">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Month</TableHead>
+                            <TableHead>Efficiency (%)</TableHead>
+                            <TableHead>Uptime (%)</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {technicalData.map((row) => (
+                            <TableRow key={row.month}>
+                              <TableCell>{row.month}</TableCell>
+                              <TableCell>{row.efficiency}%</TableCell>
+                              <TableCell>{row.uptime}%</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="technocommercial" className="h-full overflow-auto">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Techno-Commercial Insights</h3>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Key Performance Indicators</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="font-semibold">Levelized Cost of Hydrogen (LCOH)</p>
+                            <p className="text-2xl">$3.50/kg</p>
+                          </div>
+                          <div>
+                            <p className="font-semibold">Capacity Factor</p>
+                            <p className="text-2xl">85%</p>
+                          </div>
+                          <div>
+                            <p className="font-semibold">Payback Period</p>
+                            <p className="text-2xl">7.5 years</p>
+                          </div>
+                          <div>
+                            <p className="font-semibold">CO2 Emissions Avoided</p>
+                            <p className="text-2xl">50,000 tons/year</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Sensitivity Analysis</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>Placeholder for sensitivity analysis chart</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </TabsContent>
               </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
-
