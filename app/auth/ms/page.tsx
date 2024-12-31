@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { handleMsCallback } from '../../form/authUtils';
 
-export default function MsCallbackPage() {
+function MsCallbackContent() {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -47,5 +47,20 @@ export default function MsCallbackPage() {
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#CCFF00] mx-auto"></div>
       </div>
     </div>
+  );
+}
+
+export default function MsCallbackPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#1A3721]">
+        <div className="text-center">
+          <div className="text-[#CCFF00] text-xl font-semibold mb-4">Loading...</div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#CCFF00] mx-auto"></div>
+        </div>
+      </div>
+    }>
+      <MsCallbackContent />
+    </Suspense>
   );
 } 
