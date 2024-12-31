@@ -1,13 +1,19 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Outfit } from 'next/font/google'
 import './globals.css'
-import { ToastProvider } from "@/components/ui/toast-primitive";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter'
+})
 
-export const metadata: Metadata = {
-  title: 'Pablo - Green Hydrogen Solutions',
-  description: 'Optimized sizing for your green hydrogen projects',
+const outfit = Outfit({ 
+  subsets: ['latin'],
+  variable: '--font-outfit'
+})
+
+export const metadata = {
+  title: 'Pablo - Green Hydrogen Project Optimization',
+  description: 'Get instant insights into the best-fit project size, complete with detailed financial models and scenarios.',
 }
 
 export default function RootLayout({
@@ -16,12 +22,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-background`}>
-        <ToastProvider>
-          {children}
-        </ToastProvider>
-      </body>
+    <html lang="en" className={`${inter.variable} ${outfit.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   )
 }
