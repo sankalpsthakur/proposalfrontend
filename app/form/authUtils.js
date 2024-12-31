@@ -1,102 +1,100 @@
 'use client';
 
-import { getMsalInstance } from './msalConfig';
 import { AUTH_CONFIG } from './authConfig';
 
 /**
- * Acquires an access token silently or redirects to login
+ * Validates the current session with the backend
+ * @returns {Promise<{isValid: boolean, user?: {id: number, name: string, email: string}}>}
  */
-export const getAccessToken = async () => {
+export const validateSession = async () => {
   try {
-    const msalInstance = await getMsalInstance();
-    if (!msalInstance) {
-      throw new Error(AUTH_CONFIG.errors.initFailed);
-    }
-
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length === 0) {
-      throw new Error('No active account');
-    }
-
-    const tokenResponse = await msalInstance.acquireTokenSilent({
-      scopes: AUTH_CONFIG.scopes.default,
-      account: accounts[0]
+    const response = await fetch(AUTH_CONFIG.endpoints.validate, {
+      method: 'GET',
+      credentials: 'include'
     });
 
-    return tokenResponse.accessToken;
+    if (!response.ok) {
+      if (response.status === 401) {
+        return { isValid: false, error: AUTH_CONFIG.errors.unauthorized };
+      }
+      throw new Error(AUTH_CONFIG.errors.networkError);
+    }
+
+    const data = await response.json();
+    return {
+      isValid: true,
+      user: data.user
+    };
   } catch (error) {
-    console.error('Error acquiring token:', error);
-    throw error;
+    console.error('Session validation error:', error);
+    return {
+      isValid: false,
+      error: error.message
+    };
   }
 };
 
 /**
- * Validates the current session with the backend
+ * Initiates the login process by redirecting to backend signin
  */
-export const validateSession = async () => {
+export const initiateLogin = () => {
+  window.location.href = AUTH_CONFIG.endpoints.signin;
+};
+
+/**
+ * Handles Microsoft callback with authorization code
+ * @param {string} code - The authorization code from Microsoft
+ * @returns {Promise<{success: boolean, error?: string}>}
+ */
+export const handleMsCallback = async (code) => {
   try {
-    const accessToken = await getAccessToken();
-    const response = await fetch(AUTH_CONFIG.endpoints.validate, {
+    const response = await fetch(AUTH_CONFIG.endpoints.msCallback, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({ code }),
+      credentials: 'include'
     });
 
     if (!response.ok) {
-      throw new Error(AUTH_CONFIG.errors.unauthorized);
+      throw new Error('Failed to process Microsoft callback');
     }
 
-    return true;
+    const data = await response.json();
+    return { success: true, data };
   } catch (error) {
-    console.error('Session validation error:', error);
-    return false;
+    console.error('MS callback error:', error);
+    return {
+      success: false,
+      error: error.message
+    };
   }
 };
 
 /**
  * Handles user logout
+ * @returns {Promise<{success: boolean, error?: string}>}
  */
 export const logout = async () => {
   try {
-    const msalInstance = await getMsalInstance();
-    if (!msalInstance) {
-      throw new Error(AUTH_CONFIG.errors.initFailed);
+    const response = await fetch(AUTH_CONFIG.endpoints.logout, {
+      method: 'GET',
+      credentials: 'include'
+    });
+
+    if (!response.ok) {
+      throw new Error('Logout failed');
     }
 
-    // Call backend to invalidate session
-    let backendLogoutSuccessful = false;
-    try {
-      const accessToken = await getAccessToken();
-      const response = await fetch(AUTH_CONFIG.endpoints.logout, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      backendLogoutSuccessful = response.ok;
-      if (!backendLogoutSuccessful) {
-        console.error('Backend logout failed:', await response.text());
-      }
-    } catch (error) {
-      console.error('Error calling logout endpoint:', error);
-      throw new Error('Failed to invalidate backend session');
-    }
-
-    if (backendLogoutSuccessful) {
-      // Only perform MSAL logout if backend session was successfully invalidated
-      await msalInstance.logoutRedirect({
-        postLogoutRedirectUri: AUTH_CONFIG.routes.login
-      });
-    } else {
-      throw new Error('Failed to invalidate backend session');
-    }
+    const data = await response.json();
+    return { success: true, message: data.message };
   } catch (error) {
     console.error('Logout error:', error);
-    throw error;
+    return {
+      success: false,
+      error: error.message
+    };
   }
 };
 
