@@ -79,19 +79,8 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* Trust Section */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12 text-[#1A3721]">Trusted by Industry Leaders</h2>
-            <div className="max-w-2xl mx-auto text-center">
-              <blockquote className="text-xl italic text-[#1A3721] mb-4">"Pablo provided us with clear, actionable insights that significantly improved our project's ROI. Their optimization tools are game-changers in the green hydrogen space."</blockquote>
-              <p className="font-semibold text-[#1A3721]">- Jane Doe, CTO of GreenEnergy Innovations</p>
-            </div>
-          </div>
-        </section>
-
         {/* Simple Financial Models Section */}
-        <section className="py-20 bg-[#1A3721] text-white">
+        <section className="py-20 bg-white text-[#1A3721]">
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">Built for Transparency and Ease</h2>
             <div className="max-w-2xl mx-auto text-center">
@@ -101,21 +90,51 @@ export default function LandingPage() {
         </section>
 
         {/* Final CTA Section */}
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-[#1A3721]">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold mb-4 text-[#1A3721]">Get Optimized. Go Green.</h2>
-            <p className="text-xl mb-8 text-[#1A3721]">Join our waitlist today and start building your sustainable future.</p>
-            <Button size="lg" className="bg-[#1A3721] text-white hover:bg-[#CCFF00] hover:text-[#1A3721] font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" asChild>
+            <h2 className="text-3xl font-bold mb-4 text-white">Get Optimized. Go Green.</h2>
+            <p className="text-xl mb-8 text-white">Join our waitlist today and start building your sustainable future.</p>
+            <Button size="lg" className="bg-[#CCFF00] text-[#1A3721] hover:bg-white hover:text-[#1A3721] font-semibold px-8 py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" asChild>
               <Link href="https://forms.gle/dHvDGGf5vHZL4FSVA" target="_blank">Join Waitlist</Link>
             </Button>
           </div>
         </section>
       </main>
 
-      <footer className="bg-[#1A3721] text-white py-8">
+      <footer className="bg-[#1A3721] text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} Pablo. All rights reserved.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Pablo</h3>
+              <p className="text-sm text-gray-300">Optimizing green hydrogen projects for a sustainable future.</p>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
+              <ul className="space-y-2">
+                <li><Link href="/app" className="text-gray-300 hover:text-[#CCFF00] transition-colors">Dashboard</Link></li>
+                <li><Link href="https://forms.gle/dHvDGGf5vHZL4FSVA" target="_blank" className="text-gray-300 hover:text-[#CCFF00] transition-colors">Join Waitlist</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Contact</h3>
+              <div className="flex flex-col space-y-4">
+                <p className="text-sm text-gray-300">Have questions? Get in touch with our team.</p>
+                <div>
+                  <Button variant="outline" className="border-[#CCFF00] text-[#CCFF00] hover:bg-[#CCFF00] hover:text-[#1A3721] w-full md:w-auto" asChild>
+                    <Link href="mailto:sankalp.thakur@hygenco.in">Contact Us</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-sm text-gray-300">&copy; {new Date().getFullYear()} Pablo. All rights reserved.</p>
+              <div className="flex space-x-6 mt-4 md:mt-0">
+                <Link href="/privacy" className="text-sm text-gray-300 hover:text-[#CCFF00] transition-colors">Privacy Policy</Link>
+                <Link href="/terms" className="text-sm text-gray-300 hover:text-[#CCFF00] transition-colors">Terms of Service</Link>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
