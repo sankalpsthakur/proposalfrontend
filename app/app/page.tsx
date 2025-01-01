@@ -6,11 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { FinancialModelSummary } from "@/components/FinancialModelSummary"
 import { ArrowRight } from "lucide-react"
 import { withAuth } from '../form/authWrapper'
+import { toast } from 'react-toastify'
 
 const financialModels = [
   { id: "khopoli", name: "Khopoli Model", description: "Khopoli Model" },
@@ -22,7 +22,6 @@ const RunOptimizationPage = () => {
   const [activeTab, setActiveTab] = useState("financial-model")
   const [isOptimizing, setIsOptimizing] = useState(false)
   const [selectedModel, setSelectedModel] = useState("")
-  const { toast } = useToast()
 
   const handleOptimize = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -89,10 +88,7 @@ const RunOptimizationPage = () => {
 
       if (result.status === 'queued') {
         console.log("[handleOptimize] Optimization request queued successfully.")
-        toast({
-          title: "Optimization request queued",
-          description: "Your request has been queued. Results will be sent to your email address in approximately one hour.",
-        })
+        toast.success("Your request has been queued. Results will be sent to your email address in approximately one hour.")
         setActiveTab("results")
       } else {
         console.error("[handleOptimize] Unexpected response structure:", result)
@@ -103,11 +99,7 @@ const RunOptimizationPage = () => {
       if (error.stack) {
         console.error("[handleOptimize] Error stack:", error.stack)
       }
-      toast({
-        title: "Optimization request failed", 
-        description: error.message || "An error occurred while submitting your optimization request. Please try again.",
-        variant: "destructive",
-      })
+      toast.error(error.message || "An error occurred while submitting your optimization request. Please try again.")
     } finally {
       console.log("[handleOptimize] Final cleanup: Setting isOptimizing to false.")
       setIsOptimizing(false)
@@ -385,5 +377,5 @@ const RunOptimizationPage = () => {
   )
 }
 
-export default withAuth(RunOptimizationPage)
-// export default RunOptimizationPage
+// export default withAuth(RunOptimizationPage)
+export default RunOptimizationPage
