@@ -64,9 +64,9 @@ const RunOptimizationPage = () => {
 
     try {
       const requestBody = JSON.stringify({ Ui_variables: data })
-      console.log("[handleOptimize] Sending POST request to /api/optimize with body:", requestBody)
+      console.log("[handleOptimize] Sending POST request to /optimize with body:", requestBody)
 
-      const response = await fetch('/api/optimize', {
+      const response = await fetch('/optimize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -377,5 +377,5 @@ const RunOptimizationPage = () => {
   )
 }
 
-// export default withAuth(RunOptimizationPage)
-export default RunOptimizationPage
+export default withAuth(RunOptimizationPage)
+// export default RunOptimizationPage
