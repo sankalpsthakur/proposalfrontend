@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -12,16 +12,52 @@ import { ArrowRight } from "lucide-react"
 import { withAuth } from '../form/authWrapper'
 import { toast } from 'react-toastify'
 
-const financialModels = [
-  { id: "khopoli", name: "Khopoli Model", description: "Khopoli Model" },
-  // { id: "advanced", name: "Advanced Model", description: "Comprehensive model with detailed cash flow projections" },
-  // { id: "custom", name: "Custom Model", description: "Tailored model based on specific project requirements" },
-]
+interface FinancialModel {
+  name: string;
+}
+
+interface OptimizationRun {
+  created_at: string;
+  operation_run_id: string;
+  status: string;
+  updated_at: string;
+}
 
 const RunOptimizationPage = () => {
   const [activeTab, setActiveTab] = useState("financial-model")
   const [isOptimizing, setIsOptimizing] = useState(false)
   const [selectedModel, setSelectedModel] = useState("")
+  const [selectedRun, setSelectedRun] = useState<OptimizationRun | null>(null)
+  const [optimizationRuns, setOptimizationRuns] = useState<OptimizationRun[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [financialModels, setFinancialModels] = useState<string[]>([])
+  const [isLoadingModels, setIsLoadingModels] = useState(false)
+
+  const fetchFinancialModels = async () => {
+    setIsLoadingModels(true);
+    try {
+      const response = await fetch('https://proposal.hygenco.in/api/getFinancialModels', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setFinancialModels(data);
+    } catch (error) {
+      console.error('Error fetching financial models:', error);
+      toast.error('Failed to load financial models. Please try again later.');
+    } finally {
+      setIsLoadingModels(false);
+    }
+  };
 
   const handleOptimize = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -110,6 +146,39 @@ const RunOptimizationPage = () => {
     // Add your custom input data here if needed
   };
 
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return dateString;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'failed':
+        return 'bg-red-100 text-red-800';
+      case 'running':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleRunClick = async (run: OptimizationRun) => {
+    setSelectedRun(run);
+    // API call for detailed view will be added here later
+  };
+
   return (
     <div className="container mx-auto p-4">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -126,26 +195,29 @@ const RunOptimizationPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <Select value={selectedModel} onValueChange={setSelectedModel}>
+                <Select 
+                  value={selectedModel} 
+                  onValueChange={setSelectedModel} 
+                  onOpenChange={(open) => {
+                    if (open && financialModels.length === 0) {
+                      fetchFinancialModels();
+                    }
+                  }}
+                >
                   <SelectTrigger className="w-full h-10 px-3 py-2 text-base border rounded-md bg-white text-black">
-                    <SelectValue placeholder="Select a financial model" className="text-muted-foreground" />
+                    <SelectValue placeholder={isLoadingModels ? "Loading models..." : "Select a financial model"} className="text-muted-foreground" />
                   </SelectTrigger>
                   <SelectContent className="bg-white text-black">
-                    {financialModels.map((model) => (
-                      <SelectItem key={model.id} value={model.id} className="cursor-pointer hover:bg-gray-100">
-                        {model.name}
+                    {financialModels.map((modelName) => (
+                      <SelectItem key={modelName} value={modelName} className="cursor-pointer hover:bg-gray-100">
+                        {modelName}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {selectedModel && (
-                  <p className="text-sm text-muted-foreground">
-                    {financialModels.find(m => m.id === selectedModel)?.description}
-                  </p>
-                )}
                 <Button 
                   onClick={() => setActiveTab("assumptions-variables")} 
-                  disabled={!selectedModel}
+                  disabled={!selectedModel || isLoadingModels}
                   className="w-full flex items-center justify-center gap-2"
                 >
                   Continue to Assumptions & Variables
@@ -164,7 +236,7 @@ const RunOptimizationPage = () => {
             <CardContent>
               {selectedModel && (
                 <FinancialModelSummary 
-                  model={financialModels.find(m => m.id === selectedModel)!}
+                  model={{ name: selectedModel, description: '' }}
                   customInputs={customInputs}
                 />
               )}
@@ -360,17 +432,61 @@ const RunOptimizationPage = () => {
           </Card>
         </TabsContent>
         <TabsContent value="results">
-          <Card>
-            <CardHeader>
-              <CardTitle>Results</CardTitle>
-              <CardDescription>Your optimization results</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-lg">
-                Your optimization request has been submitted. The results will be sent to your email address in approximately one hour.
-              </p>
-            </CardContent>
-          </Card>
+          <div className="space-y-4">
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded relative">
+                <strong className="font-bold">Error: </strong>
+                <span className="block sm:inline">{error}</span>
+              </div>
+            )}
+
+            {selectedRun ? (
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle className="text-xl font-semibold">Run Details</CardTitle>
+                      <CardDescription>
+                        ID: {selectedRun.operation_run_id || 'N/A'}
+                      </CardDescription>
+                    </div>
+                    <Button 
+                      variant="outline"
+                      onClick={() => setSelectedRun(null)}
+                      className="ml-4"
+                    >
+                      Back to List
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Created</h3>
+                        <p className="mt-1 text-sm">{formatDate(selectedRun.created_at)}</p>
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-medium text-gray-500">Updated</h3>
+                        <p className="mt-1 text-sm">{formatDate(selectedRun.updated_at)}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                      <span className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(selectedRun.status)}`}>
+                        {selectedRun.status}
+                      </span>
+                    </div>
+                    {/* Additional details will be added here when the API is provided */}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="flex justify-center items-center h-full">
+                <p className="text-gray-500">No run selected</p>
+              </div>
+            )}
+          </div>
         </TabsContent>
       </Tabs>
     </div>
