@@ -104,15 +104,28 @@ const RunOptimizationPage = () => {
       
       console.log("[handleOptimize] Parsed JSON response:", result)
 
-      if (result.status === 'queued') {
-        console.log("[handleOptimize] Optimization request queued successfully.")
-        // Use the message from the API response if available
-        const successMessage = result.message || "Your request has been queued. Results will be sent to your email address in approximately one hour.";
-        toastService.success(successMessage);
-        setActiveTab("results")
+      // Validate that result is an object and has the expected structure
+      if (result && typeof result === 'object') {
+        if (result.status === 'queued') {
+          console.log("[handleOptimize] Optimization request queued successfully.")
+          // Use the message from the API response if available
+          const successMessage = result.message || "Your request has been queued. Results will be sent to your email address in approximately one hour.";
+          toastService.success(successMessage);
+          setActiveTab("results")
+        } else if (result.status) {
+          // Handle other known status values if needed
+          console.log(`[handleOptimize] Request status: ${result.status}`)
+          const statusMessage = result.message || `Optimization request status: ${result.status}`;
+          toastService.info(statusMessage);
+        } else {
+          // Missing status field
+          console.error("[handleOptimize] Response missing status field:", result)
+          toastService.error('Unexpected response format from server. Missing status information.');
+        }
       } else {
-        console.error("[handleOptimize] Unexpected response structure:", result)
-        toastService.error('Unexpected response from server');
+        // Not a valid object response
+        console.error("[handleOptimize] Invalid response structure:", result)
+        toastService.error('Unexpected response format from server. Please try again.');
       }
     } catch (error) {
       console.error("[handleOptimize] Caught error:", error)
