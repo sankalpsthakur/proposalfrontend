@@ -3,8 +3,11 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@../../components/ui/popover";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { OptimizationVisualizations } from "@/components/OptimizationVisualizations";
 import { withAuth } from '../../form/authWrapper';
 import { useState } from 'react';
+import Link from 'next/link';
 
 interface OptimizationResult {
   created_at: string;
@@ -60,6 +63,7 @@ const PastOptimizationsPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [downloadingIds, setDownloadingIds] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState("details");
 
   const fetchOptimizations = async () => {
     try {
@@ -251,13 +255,13 @@ const PastOptimizationsPage = () => {
                 </PopoverTrigger>
                 {selectedOptimization?.operation_run_id === result.operation_run_id && (
                   <PopoverContent 
-                    className="w-[800px] bg-white border-2 border-black rounded-lg shadow-lg max-h-[80vh] overflow-y-auto mr-8" 
+                    className="w-[90vw] max-w-[1200px] bg-white border-2 border-black rounded-lg shadow-lg max-h-[85vh] overflow-y-auto mr-8" 
                     align="center" 
                     sideOffset={20}
                   >
                     <div className="p-6 space-y-6">
                       <div className="flex justify-between items-center border-b pb-2">
-                        <h3 className="text-lg font-semibold">Optimization Details</h3>
+                        <h3 className="text-lg font-semibold">Optimization Details: {selectedOptimization.operation_run_id}</h3>
                         <Button 
                           variant="ghost" 
                           className="h-8 w-8 p-0" 
@@ -267,73 +271,117 @@ const PastOptimizationsPage = () => {
                         </Button>
                       </div>
                       
-                      <div className="space-y-6">
-                        <div>
-                          <h4 className="font-medium text-sm text-gray-500 mb-2">Basic Information</h4>
-                          <Table className="border border-gray-200">
-                            <TableBody>
-                              <TableRow>
-                                <TableCell className="font-medium bg-gray-50 w-1/3">Operation ID</TableCell>
-                                <TableCell>{selectedOptimization.operation_run_id}</TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell className="font-medium bg-gray-50">Status</TableCell>
-                                <TableCell>
-                                  <span className={`px-2 py-1 rounded-full text-sm ${
-                                    selectedOptimization.status?.toLowerCase() === 'failed' 
-                                      ? 'bg-red-100 text-red-800'
-                                      : selectedOptimization.status?.toLowerCase() === 'pending'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : 'bg-green-100 text-green-800'
-                                  }`}>
-                                    {selectedOptimization.status}
-                                  </span>
-                                </TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell className="font-medium bg-gray-50">Created</TableCell>
-                                <TableCell>{formatDate(selectedOptimization.created_at)}</TableCell>
-                              </TableRow>
-                              <TableRow>
-                                <TableCell className="font-medium bg-gray-50">Updated</TableCell>
-                                <TableCell>{formatDate(selectedOptimization.updated_at)}</TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </div>
-
-                        {selectedOptimization.optimised_variables && (
-                          <div>
-                            <h4 className="font-medium text-sm text-gray-500 mb-2">Optimized Variables</h4>
-                            <Table className="border border-gray-200">
-                              <TableBody>
-                                {Object.entries(selectedOptimization.optimised_variables).map(([key, value]) => (
-                                  <TableRow key={key}>
-                                    <TableCell className="font-medium bg-gray-50 w-1/3">{key}</TableCell>
-                                    <TableCell>{value}</TableCell>
+                      <Tabs value={activeTab} onValueChange={setActiveTab}>
+                        <TabsList className="grid w-full grid-cols-2">
+                          <TabsTrigger value="details">Details</TabsTrigger>
+                          <TabsTrigger value="visualizations">Visualizations</TabsTrigger>
+                        </TabsList>
+                        
+                        <TabsContent value="details">
+                          <div className="space-y-6 pt-4">
+                            <div>
+                              <h4 className="font-medium text-sm text-gray-500 mb-2">Basic Information</h4>
+                              <Table className="border border-gray-200">
+                                <TableBody>
+                                  <TableRow>
+                                    <TableCell className="font-medium bg-gray-50 w-1/3">Operation ID</TableCell>
+                                    <TableCell>{selectedOptimization.operation_run_id}</TableCell>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        )}
-
-                        {selectedOptimization.ui_variables && (
-                          <div>
-                            <h4 className="font-medium text-sm text-gray-500 mb-2">UI Variables</h4>
-                            <Table className="border border-gray-200">
-                              <TableBody>
-                                {Object.entries(selectedOptimization.ui_variables).map(([key, value]) => (
-                                  <TableRow key={key}>
-                                    <TableCell className="font-medium bg-gray-50 w-1/3">{key}</TableCell>
-                                    <TableCell>{value}</TableCell>
+                                  <TableRow>
+                                    <TableCell className="font-medium bg-gray-50">Status</TableCell>
+                                    <TableCell>
+                                      <span className={`px-2 py-1 rounded-full text-sm ${
+                                        selectedOptimization.status?.toLowerCase() === 'failed' 
+                                          ? 'bg-red-100 text-red-800'
+                                          : selectedOptimization.status?.toLowerCase() === 'pending'
+                                          ? 'bg-yellow-100 text-yellow-800'
+                                          : 'bg-green-100 text-green-800'
+                                      }`}>
+                                        {selectedOptimization.status}
+                                      </span>
+                                    </TableCell>
                                   </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
+                                  <TableRow>
+                                    <TableCell className="font-medium bg-gray-50">Created</TableCell>
+                                    <TableCell>{formatDate(selectedOptimization.created_at)}</TableCell>
+                                  </TableRow>
+                                  <TableRow>
+                                    <TableCell className="font-medium bg-gray-50">Updated</TableCell>
+                                    <TableCell>{formatDate(selectedOptimization.updated_at)}</TableCell>
+                                  </TableRow>
+                                </TableBody>
+                              </Table>
+                            </div>
+
+                            {selectedOptimization.optimised_variables && (
+                              <div>
+                                <h4 className="font-medium text-sm text-gray-500 mb-2">Optimized Variables</h4>
+                                <Table className="border border-gray-200">
+                                  <TableBody>
+                                    {Object.entries(selectedOptimization.optimised_variables).map(([key, value]) => (
+                                      <TableRow key={key}>
+                                        <TableCell className="font-medium bg-gray-50 w-1/3">{key}</TableCell>
+                                        <TableCell>{value}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            )}
+
+                            {selectedOptimization.ui_variables && (
+                              <div>
+                                <h4 className="font-medium text-sm text-gray-500 mb-2">UI Variables</h4>
+                                <Table className="border border-gray-200">
+                                  <TableBody>
+                                    {Object.entries(selectedOptimization.ui_variables).map(([key, value]) => (
+                                      <TableRow key={key}>
+                                        <TableCell className="font-medium bg-gray-50 w-1/3">{key}</TableCell>
+                                        <TableCell>{value}</TableCell>
+                                      </TableRow>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
+                        </TabsContent>
+                        
+                        <TabsContent value="visualizations">
+                          <div className="py-4">
+                            {selectedOptimization.status?.toLowerCase() === 'completed' ? (
+                              <div className="space-y-4">
+                                <div className="flex justify-end">
+                                  <Button variant="outline" size="sm" asChild>
+                                    <Link href={`/app/visualizations/${selectedOptimization.operation_run_id}`} target="_blank">
+                                      <svg
+                                        className="h-4 w-4 mr-2"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          strokeWidth={2}
+                                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                        />
+                                      </svg>
+                                      Open Full Screen
+                                    </Link>
+                                  </Button>
+                                </div>
+                                <OptimizationVisualizations operationRunId={selectedOptimization.operation_run_id} />
+                              </div>
+                            ) : (
+                              <div className="text-center py-8 text-gray-500">
+                                <p>Visualizations are only available for completed optimizations.</p>
+                              </div>
+                            )}
+                          </div>
+                        </TabsContent>
+                      </Tabs>
                     </div>
                   </PopoverContent>
                 )}
@@ -352,4 +400,5 @@ const PastOptimizationsPage = () => {
   );
 };
 
-export default withAuth(PastOptimizationsPage);
+// export default withAuth(PastOptimizationsPage);
+export default PastOptimizationsPage;

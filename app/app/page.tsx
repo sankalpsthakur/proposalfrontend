@@ -493,5 +493,5 @@ const RunOptimizationPage = () => {
   )
 }
 
-export default withAuth(RunOptimizationPage)
-//export default RunOptimizationPage
+// export default withAuth(RunOptimizationPage)
+export default RunOptimizationPage
