@@ -10,7 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { FinancialModelSummary } from "@/components/FinancialModelSummary"
 import { ArrowRight } from "lucide-react"
 import { withAuth } from '../form/authWrapper'
-import { toast } from 'react-toastify'
+import { useApi } from '../../hooks/useApi'
+import { toastService } from '../../services/toastService'
 
 interface FinancialModel {
   name: string;
@@ -33,27 +34,22 @@ const RunOptimizationPage = () => {
   const [error, setError] = useState<string | null>(null)
   const [financialModels, setFinancialModels] = useState<string[]>([])
   const [isLoadingModels, setIsLoadingModels] = useState(false)
+  
+  const api = useApi()
 
   const fetchFinancialModels = async () => {
     setIsLoadingModels(true);
     try {
-      const response = await fetch('https://proposal.hygenco.in/api/getFinancialModels', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const data = await api.get('https://proposal.hygenco.in/api/getFinancialModels', {
         credentials: 'include',
+        successMessage: 'Financial models loaded successfully',
+        errorMessage: 'Failed to load financial models. Please try again later.',
       });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
+      
       setFinancialModels(data);
     } catch (error) {
       console.error('Error fetching financial models:', error);
-      toast.error('Failed to load financial models. Please try again later.');
+      // Error is already handled by the useApi hook
     } finally {
       setIsLoadingModels(false);
     }
@@ -99,43 +95,28 @@ const RunOptimizationPage = () => {
     console.log("[handleOptimize] Set isOptimizing to true.")
 
     try {
-      const requestBody = JSON.stringify({ Ui_variables: data })
-      console.log("[handleOptimize] Sending POST request to /optimize with body:", requestBody)
-
-      const response = await fetch('/optimize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
-      })
-
-      console.log("[handleOptimize] Received response:", response)
-
-      if (!response.ok) {
-        console.error("[handleOptimize] Non-OK response status:", response.status, response.statusText)
-        const errorText = await response.text()
-        console.error("[handleOptimize] Response error text:", errorText)
-        throw new Error(`Optimization request failed: ${response.status} ${response.statusText}`)
-      }
-
-      const result = await response.json()
+      const result = await api.post('/optimize', { Ui_variables: data }, {
+        loadingMessage: 'Submitting optimization request...',
+        showLoadingToast: true,
+        successMessage: null, // We'll handle success message based on the response
+        errorMessage: "An error occurred while submitting your optimization request. Please try again.",
+      });
+      
       console.log("[handleOptimize] Parsed JSON response:", result)
 
       if (result.status === 'queued') {
         console.log("[handleOptimize] Optimization request queued successfully.")
-        toast.success("Your request has been queued. Results will be sent to your email address in approximately one hour.")
+        // Use the message from the API response if available
+        const successMessage = result.message || "Your request has been queued. Results will be sent to your email address in approximately one hour.";
+        toastService.success(successMessage);
         setActiveTab("results")
       } else {
         console.error("[handleOptimize] Unexpected response structure:", result)
-        throw new Error('Unexpected response from server')
+        toastService.error('Unexpected response from server');
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("[handleOptimize] Caught error:", error)
-      if (error.stack) {
-        console.error("[handleOptimize] Error stack:", error.stack)
-      }
-      toast.error(error.message || "An error occurred while submitting your optimization request. Please try again.")
+      // Error is already handled by the useApi hook
     } finally {
       console.log("[handleOptimize] Final cleanup: Setting isOptimizing to false.")
       setIsOptimizing(false)

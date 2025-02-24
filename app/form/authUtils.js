@@ -1,6 +1,7 @@
 'use client';
 
 import { AUTH_CONFIG } from './authConfig';
+import { toastService } from '../../services/toastService';
 
 /**
  * Validates the current session with the backend
@@ -16,8 +17,10 @@ export const validateSession = async () => {
     console.log('Response abheek');
     if (!response.ok) {
       if (response.status === 401) {
+        toastService.warning(AUTH_CONFIG.errors.unauthorized);
         return { isValid: false, error: AUTH_CONFIG.errors.unauthorized };
       }
+      toastService.error(AUTH_CONFIG.errors.networkError);
       throw new Error(AUTH_CONFIG.errors.networkError);
     }
 
@@ -28,6 +31,7 @@ export const validateSession = async () => {
     };
   } catch (error) {
     console.error('Session validation error:', error);
+    toastService.error(error.message || AUTH_CONFIG.errors.networkError);
     return {
       isValid: false,
       error: error.message
@@ -59,13 +63,16 @@ export const handleMsCallback = async (code) => {
     });
 
     if (!response.ok) {
+      toastService.error('Failed to process Microsoft callback');
       throw new Error('Failed to process Microsoft callback');
     }
 
     const data = await response.json();
+    toastService.success('Authentication successful');
     return { success: true, data };
   } catch (error) {
     console.error('MS callback error:', error);
+    toastService.error(error.message || 'Authentication failed');
     return {
       success: false,
       error: error.message
@@ -85,13 +92,16 @@ export const logout = async () => {
     });
 
     if (!response.ok) {
+      toastService.error('Logout failed');
       throw new Error('Logout failed');
     }
 
     const data = await response.json();
+    toastService.success(data.message || 'Logged out successfully');
     return { success: true, message: data.message };
   } catch (error) {
     console.error('Logout error:', error);
+    toastService.error(error.message || 'Logout failed');
     return {
       success: false,
       error: error.message

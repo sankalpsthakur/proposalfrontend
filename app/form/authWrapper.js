@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { validateSession, initiateLogin, logout } from './authUtils';
 import { AUTH_CONFIG } from './authConfig';
+import { toastService } from '../../services/toastService';
 
 export function withAuth(Component) {
   return function ProtectedComponent(props) {
@@ -21,6 +22,7 @@ export function withAuth(Component) {
         router.push('/');
       } else {
         setError(result.error);
+        toastService.error(result.error || 'Logout failed');
       }
     }, [router]);
 
@@ -42,6 +44,7 @@ export function withAuth(Component) {
         } catch (error) {
           console.error('Authentication error:', error);
           setError(error.message);
+          toastService.error(error.message || 'Authentication error');
         } finally {
           setIsLoading(false);
         }
