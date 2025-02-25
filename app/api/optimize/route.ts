@@ -18,19 +18,44 @@ export async function POST(request: Request) {
     if (!response.ok) {
       const text = await response.text();
       console.error('[API] Error from backend:', text);
-      return NextResponse.json({ error: `Backend request failed: ${text}` }, { status: response.status });
+      
+      // Return a structured error response with appropriate status code
+      return NextResponse.json({ 
+        error: `Backend request failed: ${text}`,
+        status: 'error',
+        code: response.status,
+        message: 'The optimization service is currently unavailable. Please try again later.'
+      }, { status: response.status });
     }
 
     const data = await response.json();
     console.log("[API] Backend response data:", data);
+    
+    // Add a message field if it doesn't exist
+    if (!data.message && data.status === 'queued') {
+      data.message = 'Your request has been queued. Results will be sent to your email address in approximately one hour.';
+    }
+    
     return NextResponse.json(data);
   } catch (error) {
     console.error('[API] Error calling backend:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    
+    // Return a structured error response
+    return NextResponse.json({ 
+      error: 'Internal server error',
+      status: 'error',
+      code: 500,
+      message: 'An unexpected error occurred. Please try again later.'
+    }, { status: 500 });
   }
 }
 
 export async function GET() {
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+  return NextResponse.json({ 
+    error: 'Method not allowed',
+    status: 'error',
+    code: 405,
+    message: 'This endpoint only accepts POST requests.'
+  }, { status: 405 });
 }
 
